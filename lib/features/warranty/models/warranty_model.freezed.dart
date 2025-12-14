@@ -25,9 +25,11 @@ mixin _$WarrantyModel {
   String get productName => throw _privateConstructorUsedError;
   DateTime get purchaseDate => throw _privateConstructorUsedError;
   DateTime get expiryDate => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _stringToDouble)
   double get amount => throw _privateConstructorUsedError;
   String get receiptPath => throw _privateConstructorUsedError;
   String get storeName => throw _privateConstructorUsedError;
+  String get category => throw _privateConstructorUsedError;
 
   /// Serializes this WarrantyModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,9 +53,10 @@ abstract class $WarrantyModelCopyWith<$Res> {
     String productName,
     DateTime purchaseDate,
     DateTime expiryDate,
-    double amount,
+    @JsonKey(fromJson: _stringToDouble) double amount,
     String receiptPath,
     String storeName,
+    String category,
   });
 }
 
@@ -79,6 +82,7 @@ class _$WarrantyModelCopyWithImpl<$Res, $Val extends WarrantyModel>
     Object? amount = null,
     Object? receiptPath = null,
     Object? storeName = null,
+    Object? category = null,
   }) {
     return _then(
       _value.copyWith(
@@ -110,6 +114,10 @@ class _$WarrantyModelCopyWithImpl<$Res, $Val extends WarrantyModel>
                 ? _value.storeName
                 : storeName // ignore: cast_nullable_to_non_nullable
                       as String,
+            category: null == category
+                ? _value.category
+                : category // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -130,9 +138,10 @@ abstract class _$$WarrantyModelImplCopyWith<$Res>
     String productName,
     DateTime purchaseDate,
     DateTime expiryDate,
-    double amount,
+    @JsonKey(fromJson: _stringToDouble) double amount,
     String receiptPath,
     String storeName,
+    String category,
   });
 }
 
@@ -157,6 +166,7 @@ class __$$WarrantyModelImplCopyWithImpl<$Res>
     Object? amount = null,
     Object? receiptPath = null,
     Object? storeName = null,
+    Object? category = null,
   }) {
     return _then(
       _$WarrantyModelImpl(
@@ -188,6 +198,10 @@ class __$$WarrantyModelImplCopyWithImpl<$Res>
             ? _value.storeName
             : storeName // ignore: cast_nullable_to_non_nullable
                   as String,
+        category: null == category
+            ? _value.category
+            : category // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -201,9 +215,10 @@ class _$WarrantyModelImpl implements _WarrantyModel {
     this.productName = '',
     required this.purchaseDate,
     required this.expiryDate,
-    this.amount = 0.0,
+    @JsonKey(fromJson: _stringToDouble) this.amount = 0.0,
     this.receiptPath = '',
     this.storeName = '',
+    this.category = 'General',
   });
 
   factory _$WarrantyModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -220,7 +235,7 @@ class _$WarrantyModelImpl implements _WarrantyModel {
   @override
   final DateTime expiryDate;
   @override
-  @JsonKey()
+  @JsonKey(fromJson: _stringToDouble)
   final double amount;
   @override
   @JsonKey()
@@ -228,10 +243,13 @@ class _$WarrantyModelImpl implements _WarrantyModel {
   @override
   @JsonKey()
   final String storeName;
+  @override
+  @JsonKey()
+  final String category;
 
   @override
   String toString() {
-    return 'WarrantyModel(id: $id, productName: $productName, purchaseDate: $purchaseDate, expiryDate: $expiryDate, amount: $amount, receiptPath: $receiptPath, storeName: $storeName)';
+    return 'WarrantyModel(id: $id, productName: $productName, purchaseDate: $purchaseDate, expiryDate: $expiryDate, amount: $amount, receiptPath: $receiptPath, storeName: $storeName, category: $category)';
   }
 
   @override
@@ -250,7 +268,9 @@ class _$WarrantyModelImpl implements _WarrantyModel {
             (identical(other.receiptPath, receiptPath) ||
                 other.receiptPath == receiptPath) &&
             (identical(other.storeName, storeName) ||
-                other.storeName == storeName));
+                other.storeName == storeName) &&
+            (identical(other.category, category) ||
+                other.category == category));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -264,6 +284,7 @@ class _$WarrantyModelImpl implements _WarrantyModel {
     amount,
     receiptPath,
     storeName,
+    category,
   );
 
   /// Create a copy of WarrantyModel
@@ -286,9 +307,10 @@ abstract class _WarrantyModel implements WarrantyModel {
     final String productName,
     required final DateTime purchaseDate,
     required final DateTime expiryDate,
-    final double amount,
+    @JsonKey(fromJson: _stringToDouble) final double amount,
     final String receiptPath,
     final String storeName,
+    final String category,
   }) = _$WarrantyModelImpl;
 
   factory _WarrantyModel.fromJson(Map<String, dynamic> json) =
@@ -303,11 +325,14 @@ abstract class _WarrantyModel implements WarrantyModel {
   @override
   DateTime get expiryDate;
   @override
+  @JsonKey(fromJson: _stringToDouble)
   double get amount;
   @override
   String get receiptPath;
   @override
   String get storeName;
+  @override
+  String get category;
 
   /// Create a copy of WarrantyModel
   /// with the given fields replaced by the non-null parameter values.

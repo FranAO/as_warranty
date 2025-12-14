@@ -6,7 +6,7 @@ part of 'warranty_list_vm.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$warrantyListHash() => r'5ae25c74e1377545381f3359b39db677fde37f06';
+String _$warrantyListHash() => r'8c93a72d002513d0d02d5d4448ef7da8bb659df0';
 
 /// See also [WarrantyList].
 @ProviderFor(WarrantyList)

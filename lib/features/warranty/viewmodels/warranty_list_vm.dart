@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:dio/dio.dart';
+import '../../../core/providers/providers.dart';
 import '../models/warranty_model.dart';
-import '../repositories/warranty_repository.dart';
 
 part 'warranty_list_vm.g.dart';
 
@@ -9,21 +8,28 @@ part 'warranty_list_vm.g.dart';
 class WarrantyList extends _$WarrantyList {
   @override
   FutureOr<List<WarrantyModel>> build() async {
-    return _fetchWarranties();
-  }
-
-  Future<List<WarrantyModel>> _fetchWarranties() async {
-    final repository = WarrantyRepository(Dio());
+    final repository = ref.watch(warrantyRepositoryProvider);
     final result = await repository.getWarranties();
-
     return result.fold(
-          (failure) => throw Exception(failure.message),
+          (failure) => [],
           (warranties) => warranties,
     );
   }
 
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _fetchWarranties());
+  Future<void> deleteWarranty(String id) async {
+    final previousState = state;
+
+    final currentList = state.valueOrNull ?? [];
+    state = AsyncData(currentList.where((w) => w.id != id).toList());
+
+    final repository = ref.read(warrantyRepositoryProvider);
+    final result = await repository.deleteWarranty(id);
+
+    result.fold(
+          (failure) {
+        state = previousState;
+      },
+          (_) {},
+    );
   }
 }

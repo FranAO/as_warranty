@@ -13,6 +13,16 @@ class WarrantyCard extends StatelessWidget {
     this.onTap,
   });
 
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Electrónica': return Icons.computer;
+      case 'Hogar': return Icons.home;
+      case 'Ropa': return Icons.checkroom;
+      case 'Vehículos': return Icons.directions_car;
+      default: return Icons.category;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -22,25 +32,39 @@ class WarrantyCard extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: warranty.receiptPath.isNotEmpty
-              ? ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.file(
-              File(warranty.receiptPath),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.receipt_long, color: Colors.grey);
-              },
-            ),
-          )
-              : const Icon(Icons.image_not_supported, color: Colors.grey),
+        leading: Stack(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: warranty.receiptPath.isNotEmpty
+                    ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    File(warranty.receiptPath),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.receipt_long, color: Colors.grey);
+                    },
+                  ),
+                )
+                    : const Icon(Icons.image_not_supported, color: Colors.grey),
+              ),
+
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: CircleAvatar(
+                  radius: 10,
+                  backgroundColor: Colors.white,
+                  child: Icon(_getCategoryIcon(warranty.category), size: 12),
+                ),
+              )
+            ]
         ),
         title: Text(
           warranty.productName,

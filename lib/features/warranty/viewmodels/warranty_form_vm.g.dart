@@ -6,7 +6,7 @@ part of 'warranty_form_vm.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$warrantyFormHash() => r'1703ec59809cfb7fda94a72a828ba3d3b4a1c45d';
+String _$warrantyFormHash() => r'd4f31847edbd8e5cc83317d00a8e9ea2f8d14793';
 
 /// See also [WarrantyForm].
 @ProviderFor(WarrantyForm)
