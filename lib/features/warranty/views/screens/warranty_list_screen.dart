@@ -51,21 +51,41 @@ class _WarrantyListScreenState extends ConsumerState<WarrantyListScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.secondary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          foregroundColor: Colors.white,
           title: _searchQuery.isEmpty
-              ? const Text('Bóveda de Garantías')
+              ? const Text(
+                  'Bóveda de Garantías',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                )
               : TextField(
             controller: _searchController,
             autofocus: true,
-            style: const TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.white),
             decoration: const InputDecoration(
               hintText: 'Buscar...',
+              hintStyle: TextStyle(color: Colors.white70),
               border: InputBorder.none,
             ),
             onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
           ),
           actions: [
             IconButton(
-              icon: Icon(_searchQuery.isEmpty ? Icons.search : Icons.close),
+              icon: Icon(_searchQuery.isEmpty ? Icons.search_rounded : Icons.close_rounded),
               onPressed: () {
                 setState(() {
                   if (_searchQuery.isEmpty) {
@@ -79,21 +99,67 @@ class _WarrantyListScreenState extends ConsumerState<WarrantyListScreen> {
             ),
           ],
           bottom: const TabBar(
+            indicatorColor: Colors.white,
+            indicatorWeight: 3,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: 'Activas', icon: Icon(Icons.check_circle_outline)),
-              Tab(text: 'Vencidas', icon: Icon(Icons.history)),
+              Tab(text: 'Activas', icon: Icon(Icons.check_circle_outline_rounded)),
+              Tab(text: 'Vencidas', icon: Icon(Icons.history_rounded)),
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const CaptureWarrantyScreen()),
-            );
-          },
-          label: const Text('Escanear'),
-          icon: const Icon(Icons.camera_alt_outlined),
+        floatingActionButton: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CaptureWarrantyScreen()),
+                );
+                // Refrescar la lista cuando vuelve de crear
+                ref.read(warrantyListProvider.notifier).refresh();
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.camera_alt_rounded, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'Escanear',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
         body: warrantyListAsync.when(
           data: (allWarranties) {
@@ -128,7 +194,17 @@ class _WarrantyListScreenState extends ConsumerState<WarrantyListScreen> {
         final warranty = warranties[i];
         return WarrantyCard(
           warranty: warranty,
-          onTap: () => _confirmDelete(context, warranty.id),
+          onDelete: () => _confirmDelete(context, warranty.id),
+          onEdit: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CaptureWarrantyScreen(warrantyToEdit: warranty),
+              ),
+            );
+            // Refrescar la lista cuando vuelve de editar
+            ref.read(warrantyListProvider.notifier).refresh();
+          },
         );
       },
     );

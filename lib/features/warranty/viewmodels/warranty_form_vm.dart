@@ -35,7 +35,7 @@ class WarrantyForm extends _$WarrantyForm {
     try {
       final inputImage = InputImage.fromFilePath(image.path);
       final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      final recognizedText = await textRecognizer.processImage(inputImage);
 
       final text = recognizedText.text;
 
@@ -45,17 +45,20 @@ class WarrantyForm extends _$WarrantyForm {
       final lines = text.split('\n');
 
       double bestAmount = 0.0;
-      double maxScore = -1.0;
+      double maxScore = -5000.0;
 
-      final blackList = [
+      final negativeKeywords = [
         'nit', 'nº', 'no.', 'num', 'n°', 'no ', 'º',
         'factura', 'autorizacion', 'control', 'codigo',
         'cuf', 'cufd', 'limite', 'emision', 'tel', 'cel',
         'sucursal', 'casa', 'matriz', 'sfc', 'original', 'copia',
-        'depto', 'ofic', 'piso', 'loc', 'zona', 'barrio', 'uv', 'mz'
+        'depto', 'ofic', 'piso', 'loc', 'zona', 'barrio', 'uv', 'mz',
+        'ci', 'ruc', 'año', 'mes', 'dia', 'fecha', 'hora',
+        'actividades', 'servicio', 'ley', 'proveedor', 'cliente'
       ];
 
-      for (var line in lines) {
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i].trim();
         final lowerLine = line.toLowerCase();
 
         final matches = RegExp(r'[\d]+(?:[.,]\d+)*').allMatches(line);
@@ -69,29 +72,34 @@ class WarrantyForm extends _$WarrantyForm {
 
           double? val = _smartParsePrice(rawNum);
 
-          if (val != null && val > 0 && val < 100000) {
+          if (val != null && val > 0 && val < 200000) {
 
-            if (val >= 1900 && val <= 2050) continue;
-            if (rawNum.replaceAll(RegExp(r'[.,]'), '').length >= 8) continue;
+            if (val >= 1900 && val <= 2050 && !rawNum.contains('.')) continue;
+
+            String cleanNum = rawNum.replaceAll(RegExp(r'[.,]'), '');
+            if (cleanNum.length >= 8) continue;
 
             double currentScore = 0.0;
 
-            if (lowerLine.contains('total')) currentScore += 100;
-            if (lowerLine.contains('importe')) currentScore += 100;
-            if (lowerLine.contains('pagar')) currentScore += 100;
-            if (lowerLine.contains('bs')) currentScore += 50;
-            if (lowerLine.contains('usd') || lowerLine.contains('sus')) currentScore += 50;
-            if (lowerLine.contains('son')) currentScore += 20;
+            if (lowerLine.contains('total') && lowerLine.contains('bs')) currentScore += 1000;
+            else if (lowerLine.contains('total')) currentScore += 500;
+            else if (lowerLine.contains('importe')) currentScore += 400;
+            else if (lowerLine.contains('pagar')) currentScore += 300;
+            else if (lowerLine.contains('son')) currentScore += 200;
 
-            if (blackList.any((word) => lowerLine.contains(word))) {
-              currentScore -= 200;
+            if (lowerLine.contains('bs') || lowerLine.contains('bolivianos')) currentScore += 150;
+
+            if (negativeKeywords.any((word) => lowerLine.contains(word))) {
+              currentScore -= 1000;
             }
 
             if (rawNum.contains('.') || rawNum.contains(',')) {
-              currentScore += 10;
+              currentScore += 50;
             }
 
-            currentScore += (val / 5000);
+            if (i > lines.length * 0.6) {
+              currentScore += 100;
+            }
 
             if (currentScore > maxScore) {
               maxScore = currentScore;
@@ -197,13 +205,15 @@ class WarrantyForm extends _$WarrantyForm {
         result.fold(
               (failure) => state = state.copyWith(status: WarrantyFormStatus.error, errorMessage: failure.message),
               (_) async {
-            int notifId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
-            await NotificationService().scheduleNotification(
-              id: notifId,
-              title: 'Garantía por vencer',
-              body: '${newWarranty.productName} vence pronto.',
-              scheduledDate: expiry,
-            );
+            try {
+              int notifId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+              await NotificationService().scheduleNotification(
+                id: notifId,
+                title: 'Garantía por vencer',
+                body: '${newWarranty.productName} vence pronto.',
+                scheduledDate: expiry,
+              );
+            } catch (_) {}
             state = state.copyWith(status: WarrantyFormStatus.success);
           },
         );

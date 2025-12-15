@@ -16,6 +16,16 @@ class WarrantyList extends _$WarrantyList {
     );
   }
 
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    final repository = ref.read(warrantyRepositoryProvider);
+    final result = await repository.getWarranties();
+    state = result.fold(
+          (failure) => AsyncData([]),
+          (warranties) => AsyncData(warranties),
+    );
+  }
+
   Future<void> deleteWarranty(String id) async {
     final previousState = state;
 

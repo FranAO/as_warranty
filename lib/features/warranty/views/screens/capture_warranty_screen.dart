@@ -120,10 +120,13 @@ class _CaptureWarrantyScreenState extends ConsumerState<CaptureWarrantyScreen> {
       }
 
       if (next.status == WarrantyFormStatus.success) {
-        ref.invalidate(warrantyListProvider);
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('¡Operación exitosa!')),
+          const SnackBar(
+            content: Text('¡Guardado exitosamente!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
         );
       }
       if (next.status == WarrantyFormStatus.error) {
@@ -137,7 +140,29 @@ class _CaptureWarrantyScreenState extends ConsumerState<CaptureWarrantyScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.warrantyToEdit != null ? 'Editar Garantía' : 'Nueva Garantía')),
+      appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(
+          widget.warrantyToEdit != null ? 'Editar Garantía' : 'Nueva Garantía',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -268,20 +293,40 @@ class _CaptureWarrantyScreenState extends ConsumerState<CaptureWarrantyScreen> {
           if (state.status == WarrantyFormStatus.processing ||
               state.status == WarrantyFormStatus.loading)
             Container(
-              color: Colors.black54,
+              color: Colors.black87,
               child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(color: Colors.white),
-                    const SizedBox(height: 16),
-                    Text(
-                      state.status == WarrantyFormStatus.processing
-                          ? 'Analizando recibo con IA...'
-                          : 'Guardando...',
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                    )
-                  ],
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 20),
+                      Text(
+                        state.status == WarrantyFormStatus.processing
+                            ? 'Analizando recibo con IA...'
+                            : 'Guardando garantía...',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        state.status == WarrantyFormStatus.processing
+                            ? 'Detectando precio y fecha'
+                            : 'Por favor espera un momento',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
